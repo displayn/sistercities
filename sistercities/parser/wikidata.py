@@ -10,17 +10,37 @@ from contextlib import suppress
 de_citylist = []
 my_file = Path('list_de_cities.txt')
 
+query_combine = '''SELECT ?item WHERE {
+                  {
+                  ?item wdt:P31 wd:Q3624078 .
+                  FILTER NOT EXISTS{?item wdt:P31 wd:Q3024240}
+                  }
+                  UNION {
+                     ?item wdt:P31 wd:Q5107 .
+                    }
+                  UNION {
+                     ?item wdt:P31 wd:Q1048835 .
+                   }
+                   UNION {
+                     ?item wdt:P31 wd:Q16110 .
+                   }
+                   UNION {
+                     ?item wdt:P31 wd:Q15089 .
+                   }
+                   UNION {
+                    ?item wdt:P31 wd:Q6465 .
+                   }
+                   UNION {
+                    ?item wdt:P31 wd:Q193622 .
+                    }
 
-countries_query = 'SELECT ?item WHERE {?item wdt:P31 wd:Q3624078 . FILTER NOT EXISTS{?item wdt:P31 wd:Q3024240}}'
-continent_query = 'SELECT ?item WHERE { ?item wdt:P31 wd:Q5107 .}'
+                }'''
+
 
 wikidata_site = pywikibot.Site("wikidata", "wikidata")
-generator = pg.WikidataSPARQLPageGenerator(countries_query, site=wikidata_site)
-
-generator_countinet = pg.WikidataSPARQLPageGenerator(continent_query, site=wikidata_site)
+generator = pg.WikidataSPARQLPageGenerator(query_combine, site=wikidata_site)
 
 filteredQIDs = list(generator)
-filteredQIDs.extend(list(generator_countinet))
 
 #remove possible duplicates inside a list
 #source http://stackoverflow.com/a/7961391
@@ -170,9 +190,9 @@ else:
     downloadFile()
 
 print(str(len(de_citylist))+' cities in list')
-print(de_citylist[1900:1920])
+print(de_citylist[1230:1240])
 start = timeit.default_timer()
-for city in de_citylist[1900:1920]:
+for city in de_citylist[1230:1240]:
     print(city)
     CityFind(city)
 
