@@ -4,9 +4,10 @@ from pywikibot import pagegenerators as pg
 import wikitextparser
 from pathlib import Path
 import timeit
-import json
 from contextlib import suppress
-
+import networkx as nx
+from networkx.readwrite import json_graph
+import json
 de_citylist = []
 my_file = Path('list_de_cities.txt')
 
@@ -33,7 +34,6 @@ query_combine = '''SELECT ?item WHERE {
                    UNION {
                     ?item wdt:P31 wd:Q193622 .
                     }
-
                 }'''
 
 
@@ -42,25 +42,27 @@ generator = pg.WikidataSPARQLPageGenerator(query_combine, site=wikidata_site)
 
 filteredQIDs = list(generator)
 
-#remove possible duplicates inside a list
-#source http://stackoverflow.com/a/7961391
+
 def remove_duplicates(l):
+    # remove possible duplicates inside a list
+    # source http://stackoverflow.com/a/7961391
     return list(set(l))
 
-def CityFind(cityname):
+
+def city_find(citylink):
+
     wikipedia_list =[]
     wikidata_list = []
 
-
     de_wikipedia = pywikibot.Site('de', 'wikipedia')
-    wikipedia_object = pywikibot.Page(de_wikipedia, cityname)
+    wikipedia_object = pywikibot.Page(de_wikipedia, citylink)
     if wikipedia_object.isRedirectPage():
         wikipedia_object = wikipedia_object.getRedirectTarget()
 
     wikidata_object = pywikibot.ItemPage.fromPage(wikipedia_object)
 
-    #fetch wikidata list from wikidata object
     if 'P190' in wikidata_object.claims:
+        # fetch wikidata list from wikidata object
         for city in wikidata_object.claims['P190']:
             wikidata_list.append(city.target)
 
@@ -80,12 +82,15 @@ def CityFind(cityname):
         for keyword in section_keywords:
             if sectionnamestrip.find(keyword) != -1:
                 print("get wikilinks inside the section::")
-                #possible city  -> get wikidata object
+
                 if section.wikilinks:
-                    #extract wikilinks inside the section sister city
+                    # possible city  -> get wikidata object
+
                     for wikilink in section.wikilinks:
-                        #filter out section keywords
+                        # extract wikilinks inside the section sister city
+
                         if wikilink.target in section_keywords:
+                            # filter out section keywords
                             pass
                         else:
                             with suppress(Exception):
@@ -99,7 +104,6 @@ def CityFind(cityname):
                                     else:
                                         wikipedia_list.append(wikilinkarticle)
                                         wikipedia_list= remove_duplicates(wikipedia_list)
-
                                 else:
                                     if 'Datei' in wikilink.target:
                                         pass
@@ -115,9 +119,11 @@ def CityFind(cityname):
                             for argument in template.arguments:
                                 if argument.value != '#':
                                     wikilinkarticle = pywikibot.Page(de_wikipedia, argument.value)
-                                    if wikilinkarticle.pageid != 0:
+
+                                    if wikilinkarticle.exists():
                                         if wikilinkarticle.isRedirectPage():
                                             wikilinkarticle = wikilinkarticle.getRedirectTarget()
+
                                         wikidataarticle = pywikibot.ItemPage.fromPage(wikilinkarticle)
                                         if wikidataarticle in filteredQIDs:
                                             pass
@@ -125,10 +131,13 @@ def CityFind(cityname):
                                             wikipedia_list.append(wikidataarticle)
                                             wikipedia_list = remove_duplicates(wikipedia_list)
                                         #TODO refactore to get article methode
+                                    else:
+                                        print('missing page'+ argument.value)
+
                 break
     print('wikipedi: ', end='')
     print(wikipedia_list)
-    print('wikidata: ',end='')
+    print('wikidata: ', end='')
     print(wikidata_list)
 
     merge = set(wikipedia_list).intersection(wikidata_list)
@@ -140,62 +149,96 @@ def CityFind(cityname):
     print('missing on wikidata: ', end='')
     wikidata_missing = set(wikipedia_list) - set(wikidata_list)
     print(wikidata_missing)
-    #return (wikipedia_list, wikidata_list)
+
+    city_dict = {'root_city': wikidata_object,
+                 'wiki_cities': wikipedia_list,
+                 'data_cities': wikidata_list
+    }
+    return (city_dict)
 
 
-
-def downloadFile():
+def download_file():
     de_wikipedia = pywikibot.Site('de', 'wikipedia')
     de_citylist = 'Liste_der_Städte_in_Deutschland'
     text_file = open("list_de_cities.txt", "w")
     text_file.write(pywikibot.Page(de_wikipedia, de_citylist).text)
     text_file.close()
 
-if my_file.is_file():
+def write_graph(data, filename):
+    fd = open(filename, 'w')
+    fd.write(str(data))
+    fd.close()
 
-    #print('file exist')
-    with open('list_de_cities.txt', 'r') as myfile:
+if __name__ == '__main__':
 
-        wt = wikitextparser.parse(myfile.read())
-        table0 = wt.tables[1]
-        data0 = table0.getdata()
+    if my_file.is_file():
 
-        filterarray = [
-            'Stadt',
-            'Deutschland',
-            'Gemeinde (Deutschland)',
-            'Stadtrecht',
-            'Land (Deutschland)',
-            'Liste der flächengrößten Städte und Gemeinden Deutschlands',
-            'Liste der Großstädte in Deutschland',
-            'Liste der Groß- und Mittelstädte in Deutschland',
-            'Agglomeration#Deutschland',
-            'Liste der größten deutschen Städte',
-            'Liste der kleinsten Städte in Deutschland nach Einwohnerzahl',
-            'Liste der Städte in Brandenburg',
-            'Liste der Städte in Mecklenburg-Vorpommern',
-            'Liste der Städte in Thüringen',
-            'Liste der Städte im Saarland',
-            'Liste ehemaliger Städte in Deutschland',
-            'Kategorie:Liste (Gemeinden in Deutschland)',
-            'Kategorie:Liste (Städte nach Staat)',
-            'Liste der 100 flächengrößten Städte und Gemeinden Deutschlands'
-        ]
+        with open('list_de_cities.txt', 'r') as myfile:
+            wt = wikitextparser.parse(myfile.read())
 
-        for cityname in wt.wikilinks:
-            if cityname.target not in filterarray:
-                de_citylist.append(cityname.target)
+            filterarray = [
+                'Stadt', 'Deutschland', 'Gemeinde (Deutschland)',
+                'Stadtrecht', 'Land (Deutschland)', 'Liste der flächengrößten Städte und Gemeinden Deutschlands',
+                'Liste der Großstädte in Deutschland', 'Liste der Groß- und Mittelstädte in Deutschland',
+                'Agglomeration#Deutschland',
+                'Liste der größten deutschen Städte', 'Liste der kleinsten Städte in Deutschland nach Einwohnerzahl',
+                'Liste der Städte in Brandenburg',
+                'Liste der Städte in Mecklenburg-Vorpommern', 'Liste der Städte in Thüringen',
+                'Liste der Städte im Saarland',
+                'Liste ehemaliger Städte in Deutschland', 'Kategorie:Liste (Gemeinden in Deutschland)',
+                'Kategorie:Liste (Städte nach Staat)',
+                'Liste der 100 flächengrößten Städte und Gemeinden Deutschlands'
+            ]
 
-else:
-    downloadFile()
+            for citylink in wt.wikilinks:
+                if citylink.target not in filterarray:
+                    de_citylist.append(citylink.target)
+    else:
+        download_file()
 
-print(str(len(de_citylist))+' cities in list')
-print(de_citylist[1230:1240])
-start = timeit.default_timer()
-for city in de_citylist[1230:1240]:
-    print(city)
-    CityFind(city)
+    dg = nx.Graph()
+    wg = nx.Graph()
 
-stop = timeit.default_timer()
+    print(str(len(de_citylist))+' cities in list')
+    print(de_citylist[110:112])
+    start = timeit.default_timer()
+    for city in de_citylist[110:112]:
+        print(city)
 
-print('runtime: '+str(stop - start))
+        sistercities = city_find(city)
+
+        root_city = sistercities['root_city']
+        wikipedia = sistercities['wiki_cities']
+        wikidata = sistercities['data_cities']
+        print(root_city.id)
+
+        attr = {'url': city,
+                'latest_revision_id': root_city.latest_revision_id,
+                'group': 'roots'
+                }
+
+        #add root city to wikipedia graph
+        wg.add_node(root_city.id, attr)
+        if not wikipedia:
+            print('nothing todo')
+        if wikipedia:
+            for city in wikipedia:
+                wg.add_edge(root_city.id, city.id)
+
+        #add root city to wikidata graph
+        dg.add_node(root_city.id, attr)
+        if wikidata:
+            for c in wikidata:
+                dg.add_edge(root_city.id, c.id)
+
+
+
+    write_graph(json.dumps(json_graph.node_link_data(wg)), 'wikipedia.json')
+    write_graph(json.dumps(json_graph.node_link_data(dg)), 'wikidata.json')
+    print('wikipedia')
+    print(wg.neighbors('Q501621'))
+    print('wikidata')
+    print(dg.neighbors('Q501621'))
+
+    stop = timeit.default_timer()
+    print('runtime: '+str(stop - start))
