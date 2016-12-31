@@ -112,7 +112,7 @@ def city_find(citylink):
 
                 if section.templates:
                     for template in section.templates:
-                        template_blacklist = ['Internetquelle', 'Positionskarte+', 'Positionskarte~', 'Nachbargemeinden','Literatur']
+                        template_blacklist = ['Internetquelle', 'Positionskarte+', 'Positionskarte~', 'Nachbargemeinden','Literatur','Panorama']
                         if template.name.strip() in template_blacklist:
                             pass
                         else:
@@ -200,9 +200,9 @@ if __name__ == '__main__':
     wg = nx.Graph()
 
     print(str(len(de_citylist))+' cities in list')
-    print(de_citylist[110:112])
+    print(de_citylist[93:94])
     start = timeit.default_timer()
-    for city in de_citylist[110:112]:
+    for city in de_citylist[93:94]:
         print(city)
 
         sistercities = city_find(city)
@@ -219,26 +219,53 @@ if __name__ == '__main__':
 
         #add root city to wikipedia graph
         wg.add_node(root_city.id, attr)
-        if not wikipedia:
-            print('nothing todo')
         if wikipedia:
             for city in wikipedia:
+                city.get()
+                url = ''
+                if city.labels:
+                    if city.labels['de']:
+                        url = city.labels['de']
+                    else:
+                        if city.labels['en']:
+                            url = city.labels['en']
+                        else:
+                            url = next(city.labels.__iter__())
+
+                attr_wc = {
+                        'url': url
+                        }
+
+                #add connection between root city an sister city
                 wg.add_edge(root_city.id, city.id)
+                #create or update node of the sister city
+                wg.add_node(city.id, attr_wc)
 
         #add root city to wikidata graph
         dg.add_node(root_city.id, attr)
         if wikidata:
-            for c in wikidata:
-                dg.add_edge(root_city.id, c.id)
-
+            for city in wikidata:
+                city.get()
+                url_wikidata = ''
+                if city.labels:
+                    if city.labels['de']:
+                        url_wikidata = city.labels['de']
+                    else:
+                        if city.labels['en']:
+                            url_wikidata = city.labels['en']
+                        else:
+                            url_wikidata = next(city.labels.__iter__())
+                attr_dc = {
+                    'url': url_wikidata
+                }
+                # add connection between root city an sister city
+                dg.add_edge(root_city.id, city.id)
+                # create or update node of the sister city
+                dg.add_node(city.id, attr_dc)
 
 
     write_graph(json.dumps(json_graph.node_link_data(wg)), 'wikipedia.json')
     write_graph(json.dumps(json_graph.node_link_data(dg)), 'wikidata.json')
-    print('wikipedia')
-    print(wg.neighbors('Q501621'))
-    print('wikidata')
-    print(dg.neighbors('Q501621'))
 
     stop = timeit.default_timer()
     print('runtime: '+str(stop - start))
