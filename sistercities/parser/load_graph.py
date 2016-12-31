@@ -11,4 +11,4 @@ def read_json_file(filename):
 
 
 if __name__ == '__main__':
-    read_json_file("wikidata.json")
+    read_json_file("wikipedia.json")
