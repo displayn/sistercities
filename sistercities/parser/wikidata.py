@@ -112,27 +112,27 @@ def city_find(citylink):
 
                 if section.templates:
                     for template in section.templates:
-                        template_blacklist = ['Internetquelle', 'Positionskarte+', 'Positionskarte~', 'Nachbargemeinden','Literatur','Panorama']
+                        template_blacklist = ['sortkey', 'lang', 'Internetquelle', 'Positionskarte+', 'Positionskarte~', 'Nachbargemeinden','Literatur','Panorama']
                         if template.name.strip() in template_blacklist:
                             pass
                         else:
-                            for argument in template.arguments:
-                                if argument.value != '#':
-                                    wikilinkarticle = pywikibot.Page(de_wikipedia, argument.value)
+                            with suppress(Exception):
+                                for argument in template.arguments:
+                                    if argument.value.strip() != '#':
+                                        wikilinkarticle = pywikibot.Page(de_wikipedia, argument.value)
+                                        if wikilinkarticle.exists():
+                                            if wikilinkarticle.isRedirectPage():
+                                                wikilinkarticle = wikilinkarticle.getRedirectTarget()
 
-                                    if wikilinkarticle.exists():
-                                        if wikilinkarticle.isRedirectPage():
-                                            wikilinkarticle = wikilinkarticle.getRedirectTarget()
-
-                                        wikidataarticle = pywikibot.ItemPage.fromPage(wikilinkarticle)
-                                        if wikidataarticle in filteredQIDs:
-                                            pass
+                                            wikidataarticle = pywikibot.ItemPage.fromPage(wikilinkarticle)
+                                            if wikidataarticle in filteredQIDs:
+                                                pass
+                                            else:
+                                                wikipedia_list.append(wikidataarticle)
+                                                wikipedia_list = remove_duplicates(wikipedia_list)
+                                            #TODO refactore to get article methode
                                         else:
-                                            wikipedia_list.append(wikidataarticle)
-                                            wikipedia_list = remove_duplicates(wikipedia_list)
-                                        #TODO refactore to get article methode
-                                    else:
-                                        print('missing page'+ argument.value)
+                                            print('missing page'+ argument.value)
 
                 break
     print('wikipedi: ', end='')
@@ -200,9 +200,9 @@ if __name__ == '__main__':
     wg = nx.Graph()
 
     print(str(len(de_citylist))+' cities in list')
-    print(de_citylist[93:94])
+    print(de_citylist[0:500])
     start = timeit.default_timer()
-    for city in de_citylist[93:94]:
+    for city in de_citylist[0:500]:
         print(city)
 
         sistercities = city_find(city)
@@ -224,10 +224,10 @@ if __name__ == '__main__':
                 city.get()
                 url = ''
                 if city.labels:
-                    if city.labels['de']:
+                    if 'de' in city.labels:
                         url = city.labels['de']
                     else:
-                        if city.labels['en']:
+                        if 'en' in city.labels:
                             url = city.labels['en']
                         else:
                             url = next(city.labels.__iter__())
@@ -248,10 +248,10 @@ if __name__ == '__main__':
                 city.get()
                 url_wikidata = ''
                 if city.labels:
-                    if city.labels['de']:
+                    if 'de' in city.labels:
                         url_wikidata = city.labels['de']
                     else:
-                        if city.labels['en']:
+                        if 'en' in city.labels:
                             url_wikidata = city.labels['en']
                         else:
                             url_wikidata = next(city.labels.__iter__())
