@@ -2,7 +2,7 @@
 import networkx as nx
 from networkx.readwrite import json_graph
 import json
-import os
+import collections
 
 
 def read_json_file(filename: object) -> object:
@@ -15,7 +15,8 @@ def read_json_file(filename: object) -> object:
 def city_build(name_list, qid_list) -> object:
     object_list = []
     for e in qid_list:
-        x = {e, name_list[e]}
+        x = collections.OrderedDict()
+        x = [e, name_list[e]]
         object_list.append(x)
     return object_list
 
@@ -44,7 +45,7 @@ def get(w, d) -> object:
         wikipedia_missing = set(data) - set(pedia)
         wikidata_missing = set(pedia) - set(data)
 
-        city_dict = {'QID': c,
+        city_dict = {'qid': c,
                      'url': url_wiki[c],
                      'miss_wikipedia': city_build(url_data, wikipedia_missing),
                      'intersection': city_build(url_wiki, intersection),

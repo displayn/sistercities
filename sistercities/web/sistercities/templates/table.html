@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>CasS</title>
     <!-- Latest compiled and minified CSS -->
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 
@@ -16,44 +16,51 @@
 <body>
     <div class="container">
         {% if data %}
-            <span>You have {{data|length}} cities</span>
+
+            <div class="page-header">
+  <h1>Sister Cities <small>holding {{data|length}} cities in a strange table</small></h1>
+</div>
         {% for entry in data %}
-            <div class="row">
-                <div class="col-md-4">
+           <div class="row">
+              <div class="col-sm-12">
+               <p><h3><a href="https://de.wikipedia.org/wiki/{{entry.url}}">{{entry.url}}</a>
+                <small><a href="https://www.wikidata.org/wiki/{{entry.qid}}">({{entry.qid}})</a>
+                </small>
+                </h3></p>
+                <div class="row">
+                  <div class="col-xs-3 col-sm-3">
+                      <p>missing on wikipedia</p>
+                  <ul>
+                    {% for k,v in entry['data_cities'] %}
+                            <li><a href="https://de.wikipedia.org/wiki/{{v}}">{{v}}</a>
+                             <small><a href="https://www.wikidata.org/wiki/{{k}}">({{k}})</a></small>
 
+                            </li>
+                    {% endfor %}
+                  </ul>
+                  </div>
+                  <div class="col-xs-3 col-sm-3">
+                  <p>intersection</p>
+                  <ul>
+                    {% for k,v in entry['intersection'] %}
+                            <li><a href="https://de.wikipedia.org/wiki/{{v}}">{{v}}</a>
+                             <small><a href="https://www.wikidata.org/wiki/{{k}}">({{k}})</a></small>
+                            </li>
+                     {% endfor %}
+                  </ul>
+                  </div>
+                    <div class="col-xs-3 col-sm-3">
+                        <p>missing on wikidata</p>
+                    <ul>
+                    {% for k,v in entry['miss_wikipedia'] %}
+                            <li><a href="https://de.wikipedia.org/wiki/{{v}}">{{v}}</a>
+                             <small><a href="https://www.wikidata.org/wiki/{{k}}">({{k}})</a></small>
+                            </li>
+                    {% endfor %}
+                    </ul>
+                  </div>
                 </div>
-                <div class="col-md-4"></div>
-
-            {# for each city #}
-           {% for key, value in entry.items() %}
-               {% if key == 'url' %}
-                   <div class="col-md-4">
-
-                        <h3>{{value}}</h3>{{ entry.items['QID'] }}
-                   </div>
-               {% elif key == 'intersection' %}
-                <div class="col-md-4">
-                     {% for city in entry['data_cities'] %}
-                            {{ city }}
-                        {% endfor %}
-                        <p>{{value}}</p>
-                    <p>{{value}}</p>
-               </div>
-               {% elif key == 'miss_wikipedia' %}
-                    <div class="col-md-4">
-
-                        <p>{{value}}</p>
-                   </div>
-               {% elif key == 'data_cities' %}
-                    <div class="col-md-4">
-                        {% for wikidata in entry['data_cities'] %}
-                            {{ wikidata }}
-                        {% endfor %}
-                        <p>{{value}}</p>
-                   </div>
-               {% endif %}
-
-           {% endfor %}
+              </div>
             </div>
         {% endfor %}
 

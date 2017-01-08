@@ -22,10 +22,10 @@ def read_json_file(filename: object) -> object:
 
 @app.route('/')
 def table():
-    wikidata = read_json_file(app.open_resource('wikidata.json'))
-    wikipedia = read_json_file(app.open_resource('wikidata.json'))
+    datajson = read_json_file(app.open_resource('wikipedia.json'))
+    wikijson = read_json_file(app.open_resource('wikidata.json'))
 
-    datasource = sister_graph.get(wikipedia, wikidata)
+    datasource = sister_graph.get(wikijson, datajson)
 
     return render_template('table.html', data=datasource)
 
