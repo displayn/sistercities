@@ -200,9 +200,9 @@ if __name__ == '__main__':
     wg = nx.Graph()
 
     print(str(len(de_citylist))+' cities in list')
-    print(de_citylist[0:500])
+    print(de_citylist)#[0:500]
     start = timeit.default_timer()
-    for city in de_citylist[0:500]:
+    for city in de_citylist: #[0:500]
         print(city)
 
         sistercities = city_find(city)

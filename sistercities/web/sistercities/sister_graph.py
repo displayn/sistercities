@@ -2,31 +2,37 @@
 import networkx as nx
 from networkx.readwrite import json_graph
 import json
+import os
 
-def read_json_file(filename):
+
+def read_json_file(filename: object) -> object:
     # from http://stackoverflow.com/a/34665365
     with open(filename) as f:
         js_graph = json.load(f)
     return json_graph.node_link_graph(js_graph)
 
-def get():
-    wikipedia = read_json_file("wikipedia.json")
-    wikidata = read_json_file('wikidata.json')
 
-    # stats
-    print(nx.number_of_nodes(wikipedia))
-    print(nx.number_of_nodes(wikidata))
+def city_build(name_list, qid_list) -> object:
+    object_list = []
+    for e in qid_list:
+        x = {e, name_list[e]}
+        object_list.append(x)
+    return object_list
+
+
+def get(w, d) -> object:
+    wikipedia = w
+    wikidata = d
 
     root_nodes = nx.get_node_attributes(wikipedia, 'group')
     wikidata_root_nodes = nx.get_node_attributes(wikidata, 'group')
-    # assert (len(root_nodes) is len(wikidata_root_nodes)), 'Error: Graph root size should be the same!'
+    assert (len(root_nodes) == len(wikidata_root_nodes)), 'Error: Graph root size should be the same!'
 
-
-    url = nx.get_node_attributes(wikipedia, 'url')
-    # print(root_nodes.keys())
-
+    url_wiki = nx.get_node_attributes(wikipedia, 'url')
+    url_data = nx.get_node_attributes(wikidata, 'url')
+    city_list = []
     for c in root_nodes.keys():
-        print('the city ' + c + ' ' + url.get(c))
+        # print('the city ' + c + ' ' + url.get(c))
         # load all result root nodes
         wg_neighbors = nx.all_neighbors(wikipedia, c)
         wd_neighbors = nx.all_neighbors(wikidata, c)
@@ -34,27 +40,20 @@ def get():
         pedia = set(wg_neighbors)
         data = set(wd_neighbors)
 
-        merge = set(pedia).intersection(data)
-        print("intersection:", end='')
-        print(merge)
-        print('missing on wikipedia: ', end='')
+        intersection = set(pedia).intersection(data)
         wikipedia_missing = set(data) - set(pedia)
-        print(wikipedia_missing)
-        print('missing on wikidata: ', end='')
         wikidata_missing = set(pedia) - set(data)
-        print(wikidata_missing)
 
-        for sister in wg_neighbors:
-            print(sister + ' ' + url.get(sister))
-        print('as sister cities')
-
-        print(' ')
-
-    #dict root-cities
-        #root-cities-> sistercities filterd 1. missing on wikidata, intersection, missing on wikipedia
-    return 'get table object'
-
-
+        city_dict = {'QID': c,
+                     'url': url_wiki[c],
+                     'miss_wikipedia': city_build(url_data, wikipedia_missing),
+                     'intersection': city_build(url_wiki, intersection),
+                     'data_cities': city_build(url_wiki, wikidata_missing)
+                     }
+        city_list.append(city_dict)
+        #sort all elemnts to url, to get a sorted list
+        city_list = sorted(city_list, key=lambda x: x['url'])
+    return city_list
 
 
-
+#get(read_json_file('wikipedia.json'), read_json_file('wikidata.json'))

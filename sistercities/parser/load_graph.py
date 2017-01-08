@@ -9,6 +9,20 @@ def read_json_file(filename):
     return json_graph.node_link_graph(js_graph)
 
 
+def intersection_graph(input_g, input_h):
+    g = input_g
+    h = input_h
+    r = input_g.copy()
+    r.remove_nodes_from(n for n in g if n not in h)
+    return r
+
+def difference(input_g, input_h):
+    g = input_g
+    h = input_h
+    r = input_g.copy()
+    r.remove_nodes_from(n for n in g if n in h)
+    return r
+
 
 if __name__ == '__main__':
     wikipedia = read_json_file("wikipedia.json")
@@ -24,8 +38,6 @@ if __name__ == '__main__':
 
 
     url = nx.get_node_attributes(wikipedia, 'url')
-    #print(root_nodes.keys())
-
     for c in root_nodes.keys():
         print('the city '+c+ ' '+url.get(c))
         #load all result root nodes
@@ -51,3 +63,9 @@ if __name__ == '__main__':
 
         print(' ')
 
+    test = intersection_graph(wikipedia, wikidata)
+    bla = nx.get_node_attributes(test, 'group')
+    #print(bla)
+
+    symi = difference(wikipedia,wikidata)
+    print(symi)

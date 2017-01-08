@@ -3,32 +3,65 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+    <!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+<!-- Optional theme -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+
+<!-- Latest compiled and minified JavaScript -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 <body>
-{% if name %}
-  <h1>Hello {{ name }}!</h1>
-{% else %}
-  <h1>Hello, World!</h1>
-{% endif %}
-<h2>Berlin</h2>
-<table>
-  <tr>
-    <th>de.wikipedia.org</th>
-    <th>Berlin</th>
-    <th>Wikidata</th>
-  </tr>
-  <tr>
-    <td></td>
-    <td>Smith</td>
-    <td>50</td>
-  </tr>
-  <tr>
-    <td>Eve</td>
-    <td>Jackson</td>
-    <td>94</td>
-  </tr>
-</table>
+    <div class="container">
+        {% if data %}
+            <span>You have {{data|length}} cities</span>
+        {% for entry in data %}
+            <div class="row">
+                <div class="col-md-4">
+
+                </div>
+                <div class="col-md-4"></div>
+
+            {# for each city #}
+           {% for key, value in entry.items() %}
+               {% if key == 'url' %}
+                   <div class="col-md-4">
+
+                        <h3>{{value}}</h3>{{ entry.items['QID'] }}
+                   </div>
+               {% elif key == 'intersection' %}
+                <div class="col-md-4">
+                     {% for city in entry['data_cities'] %}
+                            {{ city }}
+                        {% endfor %}
+                        <p>{{value}}</p>
+                    <p>{{value}}</p>
+               </div>
+               {% elif key == 'miss_wikipedia' %}
+                    <div class="col-md-4">
+
+                        <p>{{value}}</p>
+                   </div>
+               {% elif key == 'data_cities' %}
+                    <div class="col-md-4">
+                        {% for wikidata in entry['data_cities'] %}
+                            {{ wikidata }}
+                        {% endfor %}
+                        <p>{{value}}</p>
+                   </div>
+               {% endif %}
+
+           {% endfor %}
+            </div>
+        {% endfor %}
 
 
+    {% else %}
+      <p>No Datasets callable, run parser</p>
+    {% endif %}
+
+    </div>
 </body>
 </html>

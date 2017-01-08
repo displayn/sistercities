@@ -1,14 +1,34 @@
 # -*- coding: utf-8 -*-
 from flask import Flask
 from flask import render_template
-from sistercities.web.sistercities import sister_graph
+import sistercities.web.sistercities.sister_graph as sister_graph
+
 app = Flask(__name__)
+from networkx.readwrite import json_graph
+import json
+import os
+
+
+def read_json_file(filename: object) -> object:
+    # from http://stackoverflow.com/a/34665365
+    """
+
+    :type filename: object
+    """
+    with open(filename.name) as f:
+        js_graph = json.load(f)
+    return json_graph.node_link_graph(js_graph)
 
 
 @app.route('/')
 def table():
+    wikidata = read_json_file(app.open_resource('wikidata.json'))
+    wikipedia = read_json_file(app.open_resource('wikidata.json'))
 
-    return render_template('table.html', name = sister_graph.get())
+    datasource = sister_graph.get(wikipedia, wikidata)
+
+    return render_template('table.html', data=datasource)
+
 
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True)
