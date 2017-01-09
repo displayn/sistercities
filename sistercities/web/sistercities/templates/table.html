@@ -11,6 +11,7 @@
 
 <!-- Latest compiled and minified JavaScript -->
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+<script   src="http://code.jquery.com/jquery-3.1.1.min.js"   integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="   crossorigin="anonymous"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 <body>
@@ -18,18 +19,25 @@
         {% if data %}
 
             <div class="page-header">
-  <h1>Sister Cities <small>holding {{data|length}} cities in a strange table</small></h1>
+  <h1>Sister Cities <small> is holding {{data|length}} german cities in a strange table</small></h1>
+                <p>this table contains all queried information from <a href="https://de.wikipedia.org/wiki/Liste_der_Städte_in_Deutschland">de.wikipedia.org</a> pages and related datasets from <a href="https://wikidata.org">wikidata.org</a>.</p>
+                    <p>For more information feel free to <a href="mail:fh@display.name">contact me</a></p>
 </div>
         {% for entry in data %}
-           <div class="row">
+           <div class="row"
+           {% if entry['data_cities']|length == 0 and entry['intersection']|length == 0 and entry['miss_wikipedia']|length == 0 %}
+                style='opacity: 0.2;'
+                {% endif %}
+           >
               <div class="col-sm-12">
                <p><h3><a href="https://de.wikipedia.org/wiki/{{entry.url}}">{{entry.url}}</a>
                 <small><a href="https://www.wikidata.org/wiki/{{entry.qid}}">({{entry.qid}})</a>
                 </small>
                 </h3></p>
                 <div class="row">
+
                   <div class="col-xs-3 col-sm-3">
-                      <p>missing on wikipedia</p>
+                      <p>missing on <a href="https://de.wikipedia.org/wiki/{{entry.qid}}">de.wikipedia.org</a></p></p>
                   <ul>
                     {% for k,v in entry['data_cities'] %}
                             <li><a href="https://de.wikipedia.org/wiki/{{v}}">{{v}}</a>
@@ -49,9 +57,14 @@
                      {% endfor %}
                   </ul>
                   </div>
-                    <div class="col-xs-3 col-sm-3">
-                        <p>missing on wikidata</p>
+                    <div class="col-xs-3 col-sm-3"
+                    {%if entry['miss_wikipedia']|length != 0 %}
+                    class="bg-danger"
+                    {% endif %}
+                    ">
+                        <p>missing on <a href="https://www.wikidata.org/wiki/{{entry.qid}}">wikidata.org</a></p>
                     <ul>
+
                     {% for k,v in entry['miss_wikipedia'] %}
                             <li><a href="https://de.wikipedia.org/wiki/{{v}}">{{v}}</a>
                              <small><a href="https://www.wikidata.org/wiki/{{k}}">({{k}})</a></small>
