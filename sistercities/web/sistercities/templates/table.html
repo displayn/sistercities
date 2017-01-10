@@ -2,86 +2,155 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>CasS</title>
+    <title>Sister Cities</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="http://code.jquery.com/jquery-3.1.1.min.js"
+            integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=" crossorigin="anonymous"></script>
     <!-- Latest compiled and minified CSS -->
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+          integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
 
-<!-- Optional theme -->
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css"
+          integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
 
-<!-- Latest compiled and minified JavaScript -->
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
-<script   src="http://code.jquery.com/jquery-3.1.1.min.js"   integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="   crossorigin="anonymous"></script>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
+            integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+            crossorigin="anonymous"></script>
+
 </head>
 <body>
-    <div class="container">
-        {% if data %}
-
-            <div class="page-header">
-  <h1>Sister Cities <small> is holding {{data|length}} german cities in a strange table</small></h1>
-                <p>this table contains all queried information from <a href="https://de.wikipedia.org/wiki/Liste_der_Städte_in_Deutschland">de.wikipedia.org</a> pages and related datasets from <a href="https://wikidata.org">wikidata.org</a>.</p>
-                    <p>For more information feel free to <a href="mail:fh@display.name">contact me</a></p>
-</div>
-        {% for entry in data %}
-           <div class="row"
-           {% if entry['data_cities']|length == 0 and entry['intersection']|length == 0 and entry['miss_wikipedia']|length == 0 %}
-                style='opacity: 0.2;'
-                {% endif %}
-           >
-              <div class="col-sm-12">
-               <p><h3><a href="https://de.wikipedia.org/wiki/{{entry.url}}">{{entry.url}}</a>
-                <small><a href="https://www.wikidata.org/wiki/{{entry.qid}}">({{entry.qid}})</a>
-                </small>
-                </h3></p>
-                <div class="row">
-
-                  <div class="col-xs-3 col-sm-3">
-                      <p>missing on <a href="https://de.wikipedia.org/wiki/{{entry.qid}}">de.wikipedia.org</a></p></p>
-                  <ul>
-                    {% for k,v in entry['data_cities'] %}
-                            <li><a href="https://de.wikipedia.org/wiki/{{v}}">{{v}}</a>
-                             <small><a href="https://www.wikidata.org/wiki/{{k}}">({{k}})</a></small>
-
-                            </li>
-                    {% endfor %}
-                  </ul>
-                  </div>
-                  <div class="col-xs-3 col-sm-3">
-                  <p>intersection</p>
-                  <ul>
-                    {% for k,v in entry['intersection'] %}
-                            <li><a href="https://de.wikipedia.org/wiki/{{v}}">{{v}}</a>
-                             <small><a href="https://www.wikidata.org/wiki/{{k}}">({{k}})</a></small>
-                            </li>
-                     {% endfor %}
-                  </ul>
-                  </div>
-                    <div class="col-xs-3 col-sm-3"
-                    {%if entry['miss_wikipedia']|length != 0 %}
-                    class="bg-danger"
-                    {% endif %}
-                    ">
-                        <p>missing on <a href="https://www.wikidata.org/wiki/{{entry.qid}}">wikidata.org</a></p>
-                    <ul>
-
-                    {% for k,v in entry['miss_wikipedia'] %}
-                            <li><a href="https://de.wikipedia.org/wiki/{{v}}">{{v}}</a>
-                             <small><a href="https://www.wikidata.org/wiki/{{k}}">({{k}})</a></small>
-                            </li>
-                    {% endfor %}
-                    </ul>
-                  </div>
+<nav class="navbar navbar-default navbar-fixed-top">
+            <div class="container-fluid">
+                <!-- Brand and toggle get grouped for better mobile display -->
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                            data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="#">Brand</a>
                 </div>
-              </div>
+
+                <!-- Collect the nav links, forms, and other content for toggling -->
+                <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                    <button type="button" class="btn btn-default navbar-btn removeblanks">Toggle blank items</button>
+                    <ul class="nav navbar-nav navbar-right">
+                        <li><a href="#">Link</a></li>
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
+                               aria-haspopup="true" aria-expanded="false">Dropdown <span class="caret"></span></a>
+                            <ul class="dropdown-menu">
+                                <li><a href="#">Action</a></li>
+                                <li><a href="#">Another action</a></li>
+                                <li><a href="#">Something else here</a></li>
+                                <li role="separator" class="divider"></li>
+                                <li><a href="#">Separated link</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div><!-- /.navbar-collapse -->
+            </div><!-- /.container-fluid -->
+        </nav>
+<div class="container">
+    {% if data %}
+        <div class="page-header">
+            <h1>Sister Cities
+                <small> is holding {{ data|length }} german cities in a strange table</small>
+            </h1>
+            <p>this table contains all queried information from <a
+                    href="https://de.wikipedia.org/wiki/Liste_der_Städte_in_Deutschland">de.wikipedia.org</a> pages and
+                related datasets from <a href="https://wikidata.org">wikidata.org</a>.</p>
+            <p>For more information feel free to <a href="mail:fh@display.name">contact me</a></p>
+        </div>
+
+
+        {% for entry in data %}
+
+            {% if entry['data_cities']|length == 0 and entry['intersection']|length == 0 and entry['miss_wikipedia']|length == 0 %}
+                {% set datasetzero = True %}
+            {% else %}
+                {% set datasetzero = false %}
+            {% endif %}
+            {% if datasetzero == false and entry['data_cities']|length == 0 and entry['miss_wikipedia']|length == 0 and entry['intersection']|length != 0 %}
+                {% set consensus = True %}
+            {% else %}
+                {% set consensus = False %}
+            {% endif %}
+            <div {% if datasetzero %} class="row blankdatasets" style='opacity: 0.5;'{% else %} class="row"{% endif %}>
+                <div class="col-sm-12">
+                    <p>
+                    <h3><span class="glyphicon glyphicon-home" aria-hidden="true"></span> <a
+                            href="https://de.wikipedia.org/wiki/{{ entry.url }}">{{ entry.url }}</a>
+                        <small><a href="https://www.wikidata.org/wiki/{{ entry.qid }}">({{ entry.qid }})</a>
+                        </small>
+                    </h3>
+                    </p>
+                    {% if datasetzero %}
+                        <div class="row">
+                            <div class="col-xs-9 col-sm-9">
+                                <p>We could not parse any information from de.wikipedia.org or wikidata.org about this
+                                    Item.</p>
+                                <p>There seems to be no sister city connection.</p>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="row">
+                            <div class="col-xs-3 col-sm-3">
+                                <p>missing on <a
+                                        href="https://de.wikipedia.org/wiki/{{ entry.url }}">de.wikipedia.org</a>
+                                </p></p>
+                                <ul>
+                                    {% for k,v in entry['data_cities'] %}
+                                        <li><a href="https://de.wikipedia.org/wiki/{{ v }}">{{ v }}</a>
+                                            <small><a href="https://www.wikidata.org/wiki/{{ k }}">({{ k }})</a></small>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                            <div class="col-xs-3 col-sm-3 {% if consensus %}bg-success{% endif %}">
+                                <p>intersection</p>
+                                <ul>
+                                    {% for k,v in entry['intersection'] %}
+                                        <li><a href="https://de.wikipedia.org/wiki/{{ v }}">{{ v }}</a>
+                                            <small><a href="https://www.wikidata.org/wiki/{{ k }}">({{ k }})</a></small>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                            <div class="col-xs-3 col-sm-3">
+                                <p>missing on <a href="https://www.wikidata.org/wiki/{{ entry.qid }}">wikidata.org</a>
+                                </p>
+                                <ul>
+
+                                    {% for k,v in entry['miss_wikipedia'] %}
+                                        <li {% if entry['miss_wikipedia']|length > 0 %}
+                                            class="bg-danger"
+                                        {% endif %}><a href="https://de.wikipedia.org/wiki/{{ v }}">{{ v }}</a>
+                                            <small><a href="https://www.wikidata.org/wiki/{{ k }}">({{ k }})</a></small>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
             </div>
         {% endfor %}
 
 
     {% else %}
-      <p>No Datasets callable, run parser</p>
+        <p>No Datasets callable, run parser</p>
     {% endif %}
 
-    </div>
+</div>
+<script>
+    $('.removeblanks').click(function () {
+        $('.blankdatasets').fadeToggle("slow", "linear");
+    });
+</script>
 </body>
 </html>
