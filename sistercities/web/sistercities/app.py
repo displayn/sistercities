@@ -7,7 +7,7 @@ from flask_debugtoolbar import DebugToolbarExtension
 import os.path, datetime
 
 app = Flask(__name__)
-app.debug = True
+app.debug = False
 app.config['SECRET_KEY'] = '86133838741634802826072472476'
 
 cache = Cache(app, config={'CACHE_TYPE': 'simple'})
