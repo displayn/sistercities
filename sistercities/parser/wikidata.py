@@ -130,7 +130,6 @@ def city_find(citylink):
                                             else:
                                                 wikipedia_list.append(wikidataarticle)
                                                 wikipedia_list = remove_duplicates(wikipedia_list)
-                                            #TODO refactore to get article methode
                                         else:
                                             print('missing page'+ argument.value)
 
@@ -200,9 +199,9 @@ if __name__ == '__main__':
     wg = nx.Graph()
 
     print(str(len(de_citylist))+' cities in list')
-    print(de_citylist)#[0:500]
+    print(de_citylist) #[40:41]
     start = timeit.default_timer()
-    for city in de_citylist: #[0:500]
+    for city in de_citylist: #[40:41]
         print(city)
 
         sistercities = city_find(city)
@@ -223,14 +222,22 @@ if __name__ == '__main__':
             for city in wikipedia:
                 city.get()
                 url = ''
-                if city.labels:
-                    if 'de' in city.labels:
-                        url = city.labels['de']
+                if city.sitelinks:
+                    if 'dewiki' in city.sitelinks:
+                        url = city.sitelinks['dewiki']
+                    elif 'enwiki' in city.sitelinks:
+                        url = city.sitelinks['enwiki']
                     else:
-                        if 'en' in city.labels:
-                            url = city.labels['en']
-                        else:
-                            url = next(city.labels.__iter__())
+                        url = next(city.sitelinks.__iter__())
+                #
+                # if city.labels:
+                #     if 'de' in city.labels:
+                #         url = city.labels['de']
+                #     else:
+                #         if 'en' in city.labels:
+                #             url = city.labels['en']
+                #         else:
+                #             url = next(city.labels.__iter__())
 
                 attr_wc = {
                         'url': url
@@ -247,14 +254,23 @@ if __name__ == '__main__':
             for city in wikidata:
                 city.get()
                 url_wikidata = ''
-                if city.labels:
-                    if 'de' in city.labels:
-                        url_wikidata = city.labels['de']
+
+                if city.sitelinks:
+                    if 'dewiki' in city.sitelinks:
+                        url_wikidata = city.sitelinks['dewiki']
+                    elif 'enwiki' in city.sitelinks:
+                        url_wikidata = city.sitelinks['enwiki']
                     else:
-                        if 'en' in city.labels:
-                            url_wikidata = city.labels['en']
-                        else:
-                            url_wikidata = next(city.labels.__iter__())
+                        url_wikidata = next(city.sitelinks.__iter__())
+
+                # if city.labels:
+                #     if 'de' in city.labels:
+                #         url_wikidata = city.labels['de']
+                #     else:
+                #         if 'en' in city.labels:
+                #             url_wikidata = city.labels['en']
+                #         else:
+                #             url_wikidata = next(city.labels.__iter__())
                 attr_dc = {
                     'url': url_wikidata
                 }
