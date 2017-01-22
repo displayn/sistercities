@@ -14,8 +14,19 @@ sourcelist = Path('list_de_cities.txt')
 
 query_combine = '''SELECT ?item WHERE {
                   {
-                  ?item wdt:P31 wd:Q3624078 .
-                  FILTER NOT EXISTS{?item wdt:P31 wd:Q3024240}
+                    ?item wdt:P31 wd:Q3624078 .
+                    FILTER NOT EXISTS{?item wdt:P31 wd:Q3024240}
+                  }
+                  UNION {
+                    ?item wdt:P31 wd:Q1221156 .
+                    FILTER NOT EXISTS{?item wdt:P31 wd:Q3024240} .
+                    FILTER NOT EXISTS{?item wdt:P31 wd:Q133442}.
+                    }
+                  UNION {
+                     ?item wdt:P31 wd:Q896375 .
+                    }
+                  UNION {
+                  ?item wdt:P31 wd:Q245065 .
                   }
                   UNION {
                      ?item wdt:P31 wd:Q5107 .
