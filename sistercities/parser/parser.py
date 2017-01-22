@@ -226,8 +226,8 @@ if __name__ == '__main__':
         download_file()
         de_citylist = input_list('list_de_cities.txt')
 
-    dg = nx.Graph()
-    wg = nx.Graph()
+    dg = nx.DiGraph()
+    wg = nx.DiGraph()
 
     print(str(len(de_citylist)) + ' cities in list')
     print(de_citylist)#[110:121])
