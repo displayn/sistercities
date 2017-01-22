@@ -8,9 +8,10 @@ import os.path, datetime
 
 app = Flask(__name__)
 app.debug = False
+TEMPLATES_AUTO_RELOAD = False
 app.config['SECRET_KEY'] = '86133838741634802826072472476'
-
 cache = Cache(app, config={'CACHE_TYPE': 'simple'})
+
 from networkx.readwrite import json_graph
 import json
 

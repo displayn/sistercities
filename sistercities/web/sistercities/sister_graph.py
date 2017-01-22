@@ -21,9 +21,13 @@ def city_build(name_list, qid_list) -> object:
     return object_list
 
 
+def test_graph():
+    get(read_json_file('wikipedia.json'), read_json_file('wikidata.json'))
+
+
 def get(w, d) -> object:
-    wikipedia = w
-    wikidata = d
+    wikipedia = nx.DiGraph(w)
+    wikidata = nx.DiGraph(d)
 
     root_nodes = nx.get_node_attributes(wikipedia, 'group')
     wikidata_root_nodes = nx.get_node_attributes(wikidata, 'group')
@@ -35,8 +39,13 @@ def get(w, d) -> object:
     for c in root_nodes.keys():
         # print('the city ' + c + ' ' + url.get(c))
         # load all result root nodes
-        wg_neighbors = nx.all_neighbors(wikipedia, c)
-        wd_neighbors = nx.all_neighbors(wikidata, c)
+        # wg_neighbors = nx.all_neighbors(wikipedia, c)
+        # wg_neighbors = nx.ego_graph(wikipedia,c,center=False, undirected=True)
+
+        wg_neighbors = wikipedia.successors(c)
+        # wd_neighbors = nx.all_neighbors(wikidata, c)
+        # wd_neighbors = nx.ego_graph(wikidata, c, center=False, undirected=True)
+        wd_neighbors = wikidata.successors(c)
 
         pedia = set(wg_neighbors)
         data = set(wd_neighbors)
@@ -52,9 +61,7 @@ def get(w, d) -> object:
                      'data_cities': city_build(url_wiki, wikidata_missing)
                      }
         city_list.append(city_dict)
-        #sort all elemnts to url, to get a sorted list
+        # sort all elemnts to url, to get a sorted list
         city_list = sorted(city_list, key=lambda x: x['url'])
     return city_list
 
-
-#get(read_json_file('wikipedia.json'), read_json_file('wikidata.json'))
