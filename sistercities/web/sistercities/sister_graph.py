@@ -35,6 +35,8 @@ def get(w, d) -> object:
 
     url_wiki = nx.get_node_attributes(wikipedia, 'url')
     url_data = nx.get_node_attributes(wikidata, 'url')
+    revision_id_wikipedia = nx.get_node_attributes(wikipedia, 'revision_id_wikipedia')
+    revision_id_wikidata = nx.get_node_attributes(wikidata, 'revision_id_wikidata')
     city_list = []
     for c in root_nodes.keys():
         # print('the city ' + c + ' ' + url.get(c))
@@ -55,6 +57,8 @@ def get(w, d) -> object:
         wikidata_missing = set(pedia) - set(data)
 
         city_dict = {'qid': c,
+                     'revision_id_wikipedia': revision_id_wikipedia[c],
+                     'revision_id_wikidata': revision_id_wikidata[c],
                      'url': url_wiki[c],
                      'miss_wikipedia': city_build(url_data, wikipedia_missing),
                      'intersection': city_build(url_wiki, intersection),

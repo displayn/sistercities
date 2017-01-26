@@ -51,7 +51,7 @@
                     href="https://de.wikipedia.org/wiki/Liste_der_Städte_in_Deutschland">de.wikipedia.org</a> pages and
                 related datasets from <a href="https://wikidata.org">wikidata.org</a>.</p>
             <p>timestamp: {{ stats }}</p>
-            <p>Captured information based on interwiki-links (de.wikipedia.org) and statements (wikidata.org)</p>
+            <p>Captured information based on <a href="https://www.mediawiki.org/wiki/Help:Links#Internal_links">internal links</a> (de.wikipedia.org) and statements (wikidata.org)</p>
             <p></p>
             <p>For more information feel free to <a href="mail:fh@display.name">contact me</a></p>
         </div>
@@ -95,7 +95,7 @@
                 <div class="row">
                     <div class="col-xs-3 col-sm-3">
                         <p>missing on <a
-                                href="https://de.wikipedia.org/wiki/{{ entry.url }}">de.wikipedia.org</a>
+                                href="https://de.wikipedia.org/w/index.php?title={{ entry.url }}&oldid={{ entry.revision_id_wikipedia }}">de.wikipedia.org</a>
                         </p></p>
                         <ul>
                             {% for k,v in entry['data_cities'] %}
@@ -118,7 +118,7 @@
                         </ul>
                     </div>
                     <div class="col-xs-3 col-sm-3">
-                        <p>missing on <a href="https://www.wikidata.org/wiki/{{ entry.qid }}">wikidata.org</a>
+                        <p>missing on <a href="https://www.wikidata.org/w/index.php?title={{ entry.id }}&oldid={{ entry.revision_id_wikidata }}">wikidata.org</a>
                         </p>
                         <ul>
 

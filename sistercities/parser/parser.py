@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from sistercities.venv.src.pywikibot import pywikibot
+
 from pywikibot import pagegenerators as pg
 import wikitextparser
 from pathlib import Path
@@ -61,14 +62,21 @@ def remove_duplicates(l):
 
 
 def city_find(citylink):
+    """
+    city_find queries article pages and matching Wikidata objects together
+
+    @param citylink: is the articleurl of the Article
+    @return: return an dict objected that contains the missing items on the Wikipedia, matched items from Wikipedia and Wikdata and only existing items on Wikidata
+    """
+
     wikipedia_list = []
     wikidata_list = []
 
     de_wikipedia = pywikibot.Site('de', 'wikipedia')
+
     wikipedia_object = pywikibot.Page(de_wikipedia, citylink)
     if wikipedia_object.isRedirectPage():
         wikipedia_object = wikipedia_object.getRedirectTarget()
-
     wikidata_object = pywikibot.ItemPage.fromPage(wikipedia_object)
 
     if 'P190' in wikidata_object.claims:
@@ -76,7 +84,7 @@ def city_find(citylink):
         for city in wikidata_object.claims['P190']:
             wikidata_list.append(city.target)
 
-    # fetch links out of wikipedia article
+    # fetch links out of Wikipedia article
     section_keywords = ['Städtepartnerschaften', 'Städtepartnerschaft',
                         'Schwesterstädte', 'Partnerstädte',
                         'Partnerschaften', 'Gemeindepartnerschaft', 'Partnerstadt']
@@ -87,14 +95,13 @@ def city_find(citylink):
         # limit sectionnames to avoid blank space missmatches
         sectionnamestrip = section.title.strip()
 
-        # search over keywords
+        # search over possible sister city keywords
         for keyword in section_keywords:
             if sectionnamestrip.find(keyword) != -1:
                 print("get wikilinks inside the section::")
 
                 if section.wikilinks:
                     # possible city  -> get wikidata object
-
                     for wikilink in section.wikilinks:
                         # extract wikilinks inside the section sister city
 
@@ -130,10 +137,10 @@ def city_find(citylink):
                                 for argument in template.arguments:
                                     if argument.value.strip() != '#':
                                         wikilinkarticle = pywikibot.Page(de_wikipedia, argument.value)
+
                                         if wikilinkarticle.exists():
                                             if wikilinkarticle.isRedirectPage():
                                                 wikilinkarticle = wikilinkarticle.getRedirectTarget()
-
                                             wikidataarticle = pywikibot.ItemPage.fromPage(wikilinkarticle)
                                             if wikidataarticle in filteredQIDs:
                                                 pass
@@ -160,6 +167,7 @@ def city_find(citylink):
     print(wikidata_missing)
 
     city_dict = {'root_city': wikidata_object,
+                 'wikipedia_city':wikipedia_object,
                  'wiki_cities': wikipedia_list,
                  'data_cities': wikidata_list
                  }
@@ -167,6 +175,9 @@ def city_find(citylink):
 
 
 def download_file():
+    """
+    download_file saves wikitext of 'List of Cities' to a local accessible file.
+    """
     de_wikipedia = pywikibot.Site('de', 'wikipedia')
     de_citylist = 'Liste_der_Städte_in_Deutschland'
     text_file = open("list_de_cities.txt", "w")
@@ -175,12 +186,22 @@ def download_file():
 
 
 def write_graph(data, filename):
+    """
+    write_graph writes graphdata to a file
+    @param data: is the graph data from networkx
+    @param filename: is the filename for local storage
+    """
     fd = open(filename, 'w')
     fd.write(str(data))
     fd.close()
 
 
 def input_list(filename):
+    """
+    inputlist read the article wikitext of the citylist
+    @param filename: name of the local saved wikitext
+    @return: citylist that contains filter names
+    """
     citylist = []
     with open(filename, 'r') as myfile:
         wt = wikitextparser.parse(myfile.read())
@@ -204,30 +225,40 @@ def input_list(filename):
                 citylist.append(citylink.target)
     return citylist
 
+
 def add_graph_nodes(data_graph, root_city, wikicities, root_city_attributes):
-        #create root node
-        data_graph.add_node(root_city.id, root_city_attributes)
+    """
+    add_graph_nodes adds nodes to a graph and returns the new graph
+    @param data_graph: the current graph
+    @param root_city: the root city
+    @param wikicities: all catched cities out of wikipedia
+    @param root_city_attributes: attributes of the root_city
+    @return: the updated data_graph
+    """
 
-        for city in wikicities:
-            city.get()
-            url = ''
-            if city.sitelinks:
-                if 'dewiki' in city.sitelinks:
-                    url = city.sitelinks['dewiki']
-                elif 'enwiki' in city.sitelinks:
-                    url = city.sitelinks['enwiki']
-                else:
-                    url = next(city.sitelinks.__iter__())
+    data_graph.add_node(root_city.id, root_city_attributes)
 
-            attr_child = {
-                'url': url
-            }
+    for city in wikicities:
+        city.get()
+        url = ''
+        if city.sitelinks:
+            if 'dewiki' in city.sitelinks:
+                url = city.sitelinks['dewiki']
+            elif 'enwiki' in city.sitelinks:
+                url = city.sitelinks['enwiki']
+            else:
+                url = next(city.sitelinks.__iter__())
 
-            # add connection between root city an sister city
-            data_graph.add_edge(root_city.id, city.id)
-            # create or update node of the sister city
-            data_graph.add_node(city.id, attr_child)
-        return data_graph
+        attr_child = {
+            'url': url
+        }
+
+        # add connection between root city an sister city
+        data_graph.add_edge(root_city.id, city.id)
+        # create or update node of the sister city
+        data_graph.add_node(city.id, attr_child)
+    return data_graph
+
 
 if __name__ == '__main__':
 
@@ -241,21 +272,23 @@ if __name__ == '__main__':
     wg = nx.DiGraph()
 
     print(str(len(de_citylist)) + ' cities in list')
-    print(de_citylist)#[110:121])
+    print(de_citylist)
 
     start = timeit.default_timer()
-    for city in de_citylist:#[110:121]:
+    for city in de_citylist:
         print(city)
 
         sistercities = city_find(city)
 
         root_city = sistercities['root_city']
+        wikipedia_root_city = sistercities['wikipedia_city']
         wikipedia = sistercities['wiki_cities']
         wikidata = sistercities['data_cities']
         print(root_city.id)
 
         attr = {'url': city,
-                'latest_revision_id': root_city.latest_revision_id,
+                'revision_id_wikidata': root_city.latest_revision_id,
+                'revision_id_wikipedia': wikipedia_root_city.latest_revision_id,
                 'group': 'roots'
                 }
 
