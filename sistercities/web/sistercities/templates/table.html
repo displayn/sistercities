@@ -107,11 +107,11 @@
                             {% endfor %}
                         </ul>
                     </div>
-                    <div class="col-xs-3 col-sm-3 {% if consensus %}bg-success{% endif %}">
+                    <div class="col-xs-3 col-sm-3">
                         <p>intersection</p>
                         <ul>
                             {% for k,v in entry['intersection'] %}
-                                <li><a href="https://de.wikipedia.org/wiki/{{ v }}">{{ v }}</a>
+                                <li {% if consensus %} class="bg-success"{% endif %}><a href="https://de.wikipedia.org/wiki/{{ v }}">{{ v }}</a>
                                     <small><a href="https://www.wikidata.org/wiki/{{ k }}">({{ k }})</a></small>
                                 </li>
                             {% endfor %}
