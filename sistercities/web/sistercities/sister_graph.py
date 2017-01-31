@@ -3,8 +3,6 @@ import networkx as nx
 from networkx.readwrite import json_graph
 import json
 import collections
-from functools import cmp_to_key
-import locale
 
 def read_json_file(filename: object) -> object:
     # from http://stackoverflow.com/a/34665365
@@ -16,9 +14,9 @@ def read_json_file(filename: object) -> object:
 def city_build(name_list, qid_list) -> object:
     object_list = []
     for e in qid_list:
-        x = collections.OrderedDict()
         x = [e, name_list[e]]
         object_list.append(x)
+    object_list = sorted(object_list, key=lambda x: x[1])
     return object_list
 
 
@@ -40,14 +38,7 @@ def get(w, d) -> object:
     revision_id_wikidata = nx.get_node_attributes(wikidata, 'revision_id_wikidata')
     city_list = []
     for c in root_nodes.keys():
-        # print('the city ' + c + ' ' + url.get(c))
-        # load all result root nodes
-        # wg_neighbors = nx.all_neighbors(wikipedia, c)
-        # wg_neighbors = nx.ego_graph(wikipedia,c,center=False, undirected=True)
-
         wg_neighbors = wikipedia.successors(c)
-        # wd_neighbors = nx.all_neighbors(wikidata, c)
-        # wd_neighbors = nx.ego_graph(wikidata, c, center=False, undirected=True)
         wd_neighbors = wikidata.successors(c)
 
         pedia = set(wg_neighbors)
@@ -66,7 +57,6 @@ def get(w, d) -> object:
                      'data_cities': city_build(url_wiki, wikidata_missing)
                      }
         city_list.append(city_dict)
-        # sort all elemnts to url, to get a sorted list
-        city_list = sorted(city_list, key=lambda x: x['url'])
+    city_list = sorted(city_list, key=lambda x: x['url'])
     return city_list
 
