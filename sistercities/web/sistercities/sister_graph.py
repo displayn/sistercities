@@ -2,11 +2,13 @@
 import networkx as nx
 from networkx.readwrite import json_graph
 import json
-import collections
 
 def read_json_file(filename: object) -> object:
     # from http://stackoverflow.com/a/34665365
-    with open(filename) as f:
+    """
+    :type filename: object
+    """
+    with open(filename.name) as f:
         js_graph = json.load(f)
     return json_graph.node_link_graph(js_graph)
 

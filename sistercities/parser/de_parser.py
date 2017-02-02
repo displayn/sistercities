@@ -244,13 +244,16 @@ def add_graph_nodes(data_graph, root_city, wikicities, root_city_attributes):
         if city.sitelinks:
             if 'dewiki' in city.sitelinks:
                 url = city.sitelinks['dewiki']
+                wiki = 'dewiki'
             elif 'enwiki' in city.sitelinks:
                 url = city.sitelinks['enwiki']
+                wiki = 'enwiki'
             else:
                 url = next(city.sitelinks.__iter__())
 
         attr_child = {
-            'url': url
+            'url': url,
+            'wiki': wiki
         }
 
         # add connection between root city an sister city
