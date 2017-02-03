@@ -1,0 +1,5 @@
+mylang = 'en'
+usernames['wikipedia']['en'] = u'<wikimediausername>'
+usernames['wikipedia']['de'] = u'<wikimediausername>'
+usernames['wikidata']['wikidata'] = u'<wikimediausername>'
+console_encoding = 'utf-8'
