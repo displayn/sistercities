@@ -118,7 +118,7 @@
                         </ul>
                     </div>
                     <div class="col-xs-3 col-sm-3">
-                        <p>missing on <a href="https://www.wikidata.org/w/index.php?title={{ entry.id }}&oldid={{ entry.revision_id_wikidata }}">wikidata.org</a>
+                        <p>missing on <a href="https://www.wikidata.org/w/index.php?title={{ entry.id }}&oldid={{ entry.revision_id_wikidata }}{% if entry['miss_wikipedia']|length != 0 %}#P190{% endif %}">wikidata.org</a>
                         </p>
                         <ul>
 
