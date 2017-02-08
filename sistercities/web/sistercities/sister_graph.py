@@ -22,10 +22,6 @@ def city_build(name_list, qid_list) -> object:
     return object_list
 
 
-def test_graph():
-    get(read_json_file('wikipedia.json'), read_json_file('wikidata.json'))
-
-
 def get(w, d) -> object:
     wikipedia = nx.DiGraph(w)
     wikidata = nx.DiGraph(d)
