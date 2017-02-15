@@ -231,7 +231,7 @@ def add_graph_nodes(data_graph, root_city, wikicities, root_city_attributes):
     add_graph_nodes adds nodes to a graph and returns the new graph
     @param data_graph: the current graph
     @param root_city: the root city
-    @param wikicities: all catched cities out of wikipedia
+    @param wikicities: all catched cities
     @param root_city_attributes: attributes of the root_city
     @return: the updated data_graph
     """
