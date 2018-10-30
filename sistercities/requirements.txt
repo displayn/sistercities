@@ -20,7 +20,7 @@ pytz==2016.10
 pyuca==1.1.2
 -e git+https://phabricator.wikimedia.org/diffusion/PWBC/pywikibot.git@191ccb7b7eb057081b96930df30c73dbbdaa3363#egg=pywikibot
 regex==2016.11.21
-requests==2.12.4
+requests==2.20.0
 six==1.10.0
 wcwidth==0.1.7
 Werkzeug==0.11.11
